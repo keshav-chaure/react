@@ -80,8 +80,8 @@ class CommentBox extends React.Component {
     return (
        
       <div>
-        <p>Some comment</p>
-         <input type="text" onBlur={this.onClick.bind(this)}   ref="inputTxt" />
+        <p>Search</p>
+         <input type="text" placeholder="Enter Product ID.. " onBlur={this.onClick.bind(this)}   ref="inputTxt" />
         {this.state.showReply && < ReplyForm product={product} / >}
       </div>
     )
