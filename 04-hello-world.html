@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World!</title>
+	<style>
+		.highlight{
+			color : red;
+			text-decoration: underline;
+		}
+	</style>
+	<script src="jquery-3.2.0.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+
+class ProductModel {
+			constructor(){
+			
+				this.__data = {
+					id : 0,
+					name : 'na',
+                    category:'na',
+					cost : 0,
+					discount : 0,
+                    unit: 0,
+					totalPrice : 0
+				};
+			}
+			set(attr, value){
+				if (this.__data[attr] === value) return;
+				this.__data[attr] = value;
+				
+			}
+			get(attr){
+				return this.__data[attr];
+			}
+			calculate(){
+                let tot= (this.get('cost') * this.get('unit'));
+                console.log("tot ",tot)
+				let dis =tot  * this.get('discount') / 100 ;
+                console.log("dis ",dis)
+				this.set('totalPrice', tot - dis );
+                console.log("totalPrice ",tot - dis )
+			}
+		}
+
+
+
+
+
+class ReplyForm extends React.Component {
+  constructor() {
+    super()
+  }
+  render(){
+      
+      var data = this.props.product.__data;
+    return(
+      <div><table><tbody><tr><td>Product Id:</td><td>{data.id}</td></tr><tr><td>Product Name:</td><td>{data.name}</td></tr><tr><td>Product Category:</td><td>{data.category}</td></tr><tr><td>Product Price:</td><td>{data.cost}</td></tr><tr><td>Product Unit:</td><td><input type="text" ref="unit" /></td></tr><tr><td>Product Discount:</td><td><input type="text" ref="descount" /></td></tr>
+        <tr><td><input type="button" ref="calculatePrice" value="calculate " /></td><td>total Price:{data.totalPrice}</td></tr></tbody></table></div>
+    )
+  }
+}
+
+class CommentBox extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      showReply: false
+    }
+  }
+  onClick(e){
+    e.preventDefault();
+    this.setState({showReply: !this.state.showReply})
+  }
+  render() {
+       var product=new ProductModel();
+    return (
+       
+      <div>
+        <p>Some comment</p>
+         <input type="text" onBlur={this.onClick.bind(this)}   ref="inputTxt" />
+        {this.state.showReply && < ReplyForm product={product} / >}
+      </div>
+    )
+  }
+}
+        
+ReactDOM.render(<CommentBox />, document.getElementById('app'))		
+		
+	</script>
+
+</head>
+<body>
+	
+	<div id="app">
+		
+	</div>
+	
+</body>
+</html>
