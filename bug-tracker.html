@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		.stats, .bugname{
+			font-size: 22pt;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-weight: bold;
+			font-style: italic;
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+		}
+		li{
+			margin-bottom: 10px;
+			border : 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 5px;
+			border-radius: 5px;
+		}
+		.datetime{
+			font-size: small;
+			font-style: italic;
+
+		}
+		.bugname{
+			cursor : pointer;
+		}
+	</style>
+	<script src="babel.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+
+
+	<script type="text/babel">
+
+		class BugsCollectionModel{
+			constructor(){
+				this.__listenerFns = [];
+				this.list = [
+					{name : 'Server communication failure', isClosed : false, createdAt :  new Date()},
+					{name : 'Data validation error', isClosed : false, createdAt :  new Date()},
+					{name : 'User actions not recognized', isClosed : false, createdAt :  new Date()},
+				];
+			}
+
+			onChange(listenerFn){
+				if (typeof listenerFn !== 'function')
+					throw new Error('Subscription should be a function');
+				this.__listenerFns.push(listenerFn);
+			}
+
+			emit(){
+				this.__listenerFns.forEach(listenerFn => listenerFn());
+			}
+
+			add(bugName){
+				var newBug = {
+					name : bugName,
+					isClosed : false,
+					createdAt : new Date()
+				};
+				this.list.push(newBug);
+				this.emit();
+			}
+
+			toggle(bug){
+				bug.isClosed = !bug.isClosed;
+				this.emit();
+			}
+
+			getClosedCount(){
+				return this.list.reduce((result, bug) => bug.isClosed ? ++result : result, 0);
+			}
+
+			removeClosed(){
+				this.list = this.list.filter(bug => !bug.isClosed);
+				this.emit();
+			}
+		}
+
+		class BugsCollection extends React.Component{
+			toggle(bug){
+				this.props.model.toggle(bug);
+			}
+			onAddNewClick(){
+				var bugName = this.refs.txtBugName.value;
+				this.props.model.add(bugName);
+			}
+			onRemoveClosedClick(){
+				this.props.model.removeClosed();
+			}
+			render(){
+				var bugs = this.props.model.list;
+				var closedCount = this.props.model.getClosedCount();
+				var self = this;
+				var bugItems = bugs.map(bug => {
+						var bugClass = bug.isClosed ? 'bugname closed' : 'bugname';
+						return (
+							<li>
+								<span className={bugClass} onClick={self.toggle.bind(self, bug)}>{bug.name}</span>
+								<div><i>{bug.isClosed.toString()}</i></div>
+								<div className="datetime">{bug.createdAt.toString()}</div>
+							</li>
+						);
+				});
+				return (
+					<div>
+						<section className="stats">
+							<span className="closed">{closedCount}</span>
+							<span> / </span>
+							<span>{bugs.length}</span>
+						</section>
+						<section className="edit">
+							<label htmlFor="">Bug Name :</label>
+							<input type="text" ref="txtBugName" />
+							<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)} />
+						</section>
+						<section className="list">
+							<ol>
+								{bugItems}
+							</ol>
+							<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick.bind(this)}/>
+						</section>
+
+
+					</div>
+				)
+			}
+		}
+
+		var bugsCollectionModel = new BugsCollectionModel();
+		bugsCollectionModel.onChange(renderApp);
+
+		function renderApp(){
+			ReactDOM.render(<BugsCollection model={bugsCollectionModel}></BugsCollection>, document.getElementById("content"));
+		}
+		renderApp();
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="content">
+	</div>
+</body>
+</html>
