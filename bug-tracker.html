@@ -95,8 +95,8 @@
 			toggle(bug){
 				this.props.model.toggle(bug);
 			}
-			onAddNewClick(){
-				var bugName = this.refs.txtBugName.value;
+			onAddNewClick(bugName){
+				//var bugName = this.refs.txtBugName.value;
 				this.props.model.add(bugName);
 			}
 			onRemoveClosedClick(){
@@ -118,28 +118,59 @@
 				});
 				return (
 					<div>
-						<section className="stats">
-							<span className="closed">{closedCount}</span>
-							<span> / </span>
-							<span>{bugs.length}</span>
-						</section>
-						<section className="edit">
-							<label htmlFor="">Bug Name :</label>
-							<input type="text" ref="txtBugName" />
-							<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)} />
-						</section>
-						<section className="list">
-							<ol>
-								{bugItems}
-							</ol>
-							<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClick.bind(this)}/>
-						</section>
-
-
-					</div>
+                        <BugStatus closeCNT={closedCount} bugsLNT={bugs.length}></BugStatus>
+						<BugsEdit onClick={this.onAddNewClick.bind(this)}></BugsEdit>
+					    <BugsList onClick={this.onRemoveClosedClick.bind(this)} buglist={bugItems}></BugsList>  
+                    </div>
 				)
 			}
 		}
+
+        class BugStatus extends React.Component{
+            render(){
+                var closedCount=this.props.closeCNT;
+                var bugs_length=this.props.bugsLNT;
+                return(
+                    <section className="stats">
+							<span className="closed">{closedCount}</span>
+							<span> / </span>
+							<span>{bugs_length}</span>
+				    </section>
+                )
+            }
+        }
+class BugsEdit extends React.Component{
+    onAddNewClickHandler(){
+        var bugName = this.refs.txtBugName.value;
+        this.props.onClick(bugName);
+    }
+    render(){
+        
+        return(
+            <section className="edit">
+							<label htmlFor="">Bug Name :</label>
+							<input type="text" ref="txtBugName" />
+							<input type="button" value="Add New" onClick={this.onAddNewClickHandler.bind(this)} />
+            </section>
+        )
+    }
+}
+class BugsList extends React.Component{
+    onRemoveClosedClickHandler(){
+        this.props.onClick();
+    }
+    render(){
+      var  bugItems=this.props.buglist;
+        return(
+            	<section className="list">
+							<ol>
+								{bugItems}
+							</ol>
+							<input type="button" value="Remove Closed" onClick={this.onRemoveClosedClickHandler.bind(this)}/>
+				</section>
+        )
+    }
+}
 
 		var bugsCollectionModel = new BugsCollectionModel();
 		bugsCollectionModel.onChange(renderApp);
