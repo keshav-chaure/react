@@ -54,12 +54,59 @@ class ReplyForm extends React.Component {
   constructor() {
     super()
   }
+    
+getProductCollection(){
+        console.log("get product!!");
+        return [{
+					id : 1,
+					name : 'pen',
+                    category:'statinary',
+					cost : 10,
+					discount : 0,
+                    unit: 0,
+					totalPrice : 0
+				},
+                 {
+					id : 2,
+					name : 'note book',
+                    category:'statinary',
+					cost : 30,
+					discount : 0,
+                    unit: 0,
+					totalPrice : 0
+				},{
+					id : 3,
+					name : 'pencil',
+                    category:'statinary',
+					cost : 5,
+					discount : 0,
+                    unit: 0,
+					totalPrice : 0
+				}];
+
+    }   
+    
+calculateTotal(){
+    
+    console.log("on click");
+    //console.log(this.name.unit.value);
+    //var u=this.refs.unit.value;
+    //  var d=this.refs.descount.getValue();
+   // console.log("unit : "+u+" disc : "+d)
+}    
   render(){
+      var prodArray=this.getProductCollection();
+      console.log(prodArray)
+      var pid=this.props.productid;
+        var data = prodArray.filter(function( obj ) {
+        return obj.id ==pid;
+        });
+      console.dir(data);
+      console.log("pro id :",this.props.productid);
       
-      var data = this.props.product.__data;
     return(
-      <div><table><tbody><tr><td>Product Id:</td><td>{data.id}</td></tr><tr><td>Product Name:</td><td>{data.name}</td></tr><tr><td>Product Category:</td><td>{data.category}</td></tr><tr><td>Product Price:</td><td>{data.cost}</td></tr><tr><td>Product Unit:</td><td><input type="text" ref="unit" /></td></tr><tr><td>Product Discount:</td><td><input type="text" ref="descount" /></td></tr>
-        <tr><td><input type="button" ref="calculatePrice" value="calculate " /></td><td>total Price:{data.totalPrice}</td></tr></tbody></table></div>
+      <div><table><tbody><tr><td>Product Id:</td><td>{data[0].id}</td></tr><tr><td>Product Name:</td><td>{data[0].name}</td></tr><tr><td>Product Category:</td><td>{data[0].category}</td></tr><tr><td>Product Price:</td><td>{data[0].cost}</td></tr><tr><td>Product Unit:</td><td><input type="text" name="unit" ref="unit" /></td></tr><tr><td>Product Discount:</td><td><input type="text" name="descount" ref="descount" /></td></tr>
+        <tr><td><input type="button" ref="calculatePrice" value="calculate" onClick={this.calculateTotal} /></td><td>total Price:{data[0].totalPrice}</td></tr></tbody></table></div>
     )
   }
 }
@@ -68,21 +115,29 @@ class CommentBox extends React.Component {
   constructor() {
     super();
     this.state = {
-      showReply: false
+      showReply: false,
+    productId: 0
     }
   }
   onClick(e){
     e.preventDefault();
-    this.setState({showReply: !this.state.showReply})
+      console.log(this.refs.inputTxt.value)
+      this.setState({showReply: !this.state.showReply,productId:this.refs.inputTxt.value })
   }
+    
   render() {
-       var product=new ProductModel();
+      
+     // var prodArray=this.getProductCollection();
+       var p1=new ProductModel();
+        //p1.set('id',1);
+        //p1.set('name','pen');
+       // var p1 =new ProductModel();
     return (
        
       <div>
         <p>Search</p>
          <input type="text" placeholder="Enter Product ID.. " onBlur={this.onClick.bind(this)}   ref="inputTxt" />
-        {this.state.showReply && < ReplyForm product={product} / >}
+        {this.state.showReply && < ReplyForm productid={this.state.productId} / >}
       </div>
     )
   }
