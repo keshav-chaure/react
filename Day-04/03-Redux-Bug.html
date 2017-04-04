@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Counter [Redux]</title>
+	<script src="babel.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="Redux.js"></script>
+	<script type="text/babel">
+		function bugReducer(currentBug, action){
+			switch(action.type){
+				case 'TOGGLE':
+					var bug = action.payload;
+					return {
+						name : bug.name,
+						isClosed : !bug.isClosed,
+						createdAt : bug.createdAt
+					};
+				default:
+					return {name : 'A dummy bug', isClosed : false, createdAt : new Date()}
+			}
+		}
+
+		class BugItem extends React.Component{
+			toggle(){
+				var bugToToggle = this.props.store.getState();
+				var toggleAction = {
+					type : 'TOGGLE',
+					payload : bugToToggle
+				};
+				this.props.store.dispatch(toggleAction);
+			}
+			render(){
+				var bug = this.props.store.getState();
+				console.log('In render, bug -> ', bug);
+				return (
+					<div>
+						<div onClick={this.toggle.bind(this)}>{bug.name}</div>
+						<i>{bug.isClosed.toString()}</i>
+					</div>
+				)
+			}
+		}
+
+
+		var store = Redux.createStore(bugReducer);
+		store.subscribe(renderApp)
+		function renderApp(){
+			ReactDOM.render(<BugItem store={store}></BugItem>, document.getElementById("content"));
+		}
+		renderApp();
+	</script>
+</head>
+<body>
+	<div id="content"></div>
+</body>
+</html>

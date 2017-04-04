@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World!</title>
+	<style>
+		.highlight{
+			color : red;
+			text-decoration: underline;
+		}
+	</style>
+	<script src="jquery-3.2.0.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		var HelloWorldReact = React.createClass({
+
+			getInitialState : function(){
+				return { message : '[Default message]'};
+			},
+			
+			onGreetClick : function(){
+				var msg = 'Hello ' + this.refs.txtName.value + ', Welcome to React.js!';
+				this.setState({message : msg});
+			},
+			
+			render : function(){
+				return (
+					<div>
+						<label htmlFor="">Name :</label>
+						<input type="text" ref="txtName" />
+						<input type="button" value="Greet" ref="btnGreet" onClick={this.onGreetClick} />
+						<h1 className="highlight">{this.state.message}</h1>
+					</div>
+				)
+			}
+		});
+		ReactDOM.render(<HelloWorldReact></HelloWorldReact>, document.getElementById("react-content"));
+
+		
+		
+	</script>
+
+</head>
+<body>
+	
+	<div id="react-content">
+		
+	</div>
+	
+</body>
+</html>

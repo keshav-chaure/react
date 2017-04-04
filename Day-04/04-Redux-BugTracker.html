@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Counter [Redux]</title>
+	<link rel="stylesheet" href="style.css"/>
+	<script src="babel.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="Redux.js"></script>
+	<script type="text/babel">
+		function bugsReducer(currentState = [], action){
+			switch(action.type){
+				case 'ADD_NEW':
+					var bugName = action.payload;
+					var maxId = currentState.length ? currentState.reduce((result, bug) => result > bug.id ? result : bug.id, 0) + 1 : 1;
+					var newBug = {
+						id : maxId,
+						name : bugName,
+						isClosed : false,
+						createdAt : new Date()
+					};
+					return currentState.concat([newBug]);
+
+				case 'TOGGLE':
+					var bugToToggle = action.payload;
+					return currentState.map(bug => 
+						bug === bugToToggle ? Object.assign({}, bugToToggle, {isClosed : !bugToToggle.isClosed}) : bug
+					);
+				case 'REMOVE_CLOSED':
+					return currentState.filter(bug => !bug.isClosed);
+				default:
+					return currentState;
+			}
+		}
+
+		class BugTracker extends React.Component{
+			
+			render(){
+				var bugs = this.props.model;
+				return (
+					<div>
+						<BugStats bugs={bugs}></BugStats>
+						<BugEdit onAddNew={this.props.actions.addNew}></BugEdit>
+						<BugList 
+							bugs={bugs} 
+							onRemoveClosed={this.props.actions.removeClosed}
+							onToggle={this.props.actions.toggle}
+						></BugList>
+					</div>
+				)
+			}
+		}
+
+		class BugStats extends React.Component{
+			render(){
+				var bugs = this.props.bugs,
+					closedCount = bugs.reduce((result, bug) => bug.isClosed ? ++result : result, 0);
+				return (
+					<section className="stats">
+						<span className="closed">{closedCount}</span>
+						<span> / </span>
+						<span>{bugs.length}</span>
+					</section>
+				)
+			}
+		}
+
+		class BugEdit extends React.Component{
+			onAddNewClick(){
+				var bugName = this.refs.txtBugName.value;
+				this.props.onAddNew(bugName);
+			}
+			render(){
+				return (
+					<section className="edit">
+						<label htmlFor="">Bug Name :</label>
+						<input type="text" ref="txtBugName" />
+						<input type="button" value="Add New" onClick={this.onAddNewClick.bind(this)} />
+					</section>
+				)
+			}
+		}
+
+		class BugList extends React.Component{
+			render(){
+				
+				var bugItems = this.props.bugs.map(bug => 
+					(<BugItem key={bug.id} bug={bug} onToggle={this.props.onToggle}></BugItem>)
+				);
+				return(
+					<section className="list">
+						<ol>
+							{bugItems}
+						</ol>
+						<input type="button" value="Remove Closed" onClick={this.props.onRemoveClosed}/>
+					</section>
+				);
+			}
+		}
+
+		class BugItem extends React.Component{
+			toggle(bug){
+				this.props.onToggle(bug);
+			}
+			render(){
+				var bug = this.props.bug;
+				var bugClass = bug.isClosed ? 'bugname closed' : 'bugname';
+				return (
+					<li>
+						<span className={bugClass} onClick={this.toggle.bind(this, bug)}>{bug.name}</span>
+						<div><i>{bug.isClosed.toString()}</i></div>
+						<div className="datetime">{bug.createdAt.toString()}</div>
+					</li>
+				)
+			}
+		}
+
+		var store = Redux.createStore(bugsReducer);
+		store.subscribe(renderApp);
+		//utility functions
+		function getNewBugAction(bugName){
+		    return { type : 'ADD_NEW', payload : bugName }
+		}
+		function getToggleAction(bug){
+		   return { type : 'TOGGLE', payload : bug }
+		}
+		function getRemoveClosedAction(){
+			return { type : 'REMOVE_CLOSED'}
+		}
+
+		function getDispatcher(dispatch, actionCreator){
+			return function(){
+				dispatch(actionCreator.apply(this, arguments));
+			}
+		}
+
+		var actions = {
+			addNew : getDispatcher(store.dispatch, getNewBugAction),
+			toggle : getDispatcher(store.dispatch, getToggleAction),
+			removeClosed : getDispatcher(store.dispatch, getRemoveClosedAction)
+		};
+		function renderApp(){
+			ReactDOM.render(<BugTracker model={store.getState()} actions={actions}></BugTracker>, document.getElementById("content"));
+		}
+		renderApp();
+
+		
+
+	</script>
+</head>
+<body>
+	<div id="content"></div>
+</body>
+</html>

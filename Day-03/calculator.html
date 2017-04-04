@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Calculator</title>
+	<style>
+		.positive{
+			color : green;
+			font-size: 20pt;
+			font-weight: bold;
+		}
+		.negative{
+			color : red;
+			text-decoration: line-through;
+			font-size: 20pt;
+			font-weight: bold;
+		}
+	</style>
+	<script src="babel.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	
+	<script type="text/babel">
+		String.prototype.toInt = function(){
+			return parseInt(this, 10);
+		};
+
+		class CalculatorModel{
+			constructor(){
+				this.__listenerFns = [];
+				this.number1 = 0;
+				this.number2 = 0;
+				this.result = 0;
+			}
+
+
+			onChange(listenerFn){
+				if (typeof listenerFn !== 'function')
+					throw new Error('Subscription should be a function');
+				this.__listenerFns.push(listenerFn);
+			}
+
+			emit(){
+				this.__listenerFns.forEach(listenerFn => listenerFn());
+			}
+
+			clear(){
+				this.number1 = this.number2 = this.result = 0;
+				this.emit();
+			}
+			add(){
+				this.result = this.number1 + this.number2;
+				this.emit();
+			}
+			subtract(){
+				this.result = this.number1 - this.number2;
+				this.emit();
+			}
+			multiply(){
+				this.result = this.number1 * this.number2;
+				this.emit();
+			}
+			divide(){
+				this.result = this.number1 / this.number2;
+				this.emit();
+			}
+			setNumber1(value){
+				this.number1 = value;
+				this.emit();
+			}
+
+			setNumber2(value){
+				this.number2 = value;
+				this.emit();
+			}
+		}
+
+		class Calculator extends React.Component{
+			
+			updateNumber1(){
+				this.props.model.setNumber1(this.refs.txtNumber1.value.toInt());
+			}
+			updateNumber2(){
+				this.props.model.setNumber2(this.refs.txtNumber2.value.toInt());
+			}
+			onOperationClick(operation){
+				this.props.model[operation]();
+			}
+			onClearHandler(){
+				this.props.model.clear();
+			}
+			render(){
+				return (
+					<div>
+						<input type="number" ref="txtNumber1" value={this.props.model.number1} onChange={this.updateNumber1.bind(this)} />
+						<input type="number" ref="txtNumber2" value={this.props.model.number2} onChange={this.updateNumber2.bind(this)} />
+						<input type="button" value="Add" onClick={this.onOperationClick.bind(this ,'add')} />
+						<input type="button" value="Subtract" onClick={this.onOperationClick.bind(this, 'subtract')} />
+						<input type="button" value="Multiply" onClick={this.onOperationClick.bind(this, 'multiply')} />
+						<input type="button" value="Divide" onClick={this.onOperationClick.bind(this, 'divide')} />
+						<CalculatorResult data={this.props.model.result} onClear={this.onClearHandler.bind(this)}></CalculatorResult>
+					</div>
+				)
+			}
+		}
+
+		class CalculatorResult extends React.Component{
+			onClearClick(){
+				this.props.onClear();
+			}
+			render(){
+				var result = this.props.data;
+				var styleName = result < 0 ? 'negative' : 'positive';
+				return (
+					<div>
+
+						<div className={styleName}>{result}</div>
+						<input type="button" value="Clear" onClick={this.onClearClick.bind(this)}/>
+					</div>
+				)
+			}
+		}
+
+		var calculatorModel = new CalculatorModel();
+		function renderApp(){
+			ReactDOM.render(<Calculator model={calculatorModel}></Calculator>, document.getElementById("content"));
+		}
+		renderApp();
+		calculatorModel.onChange(renderApp);
+	</script>
+</head>
+<body>
+	<h1>Calculator</h1>
+	<div id="content"></div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+
+
+		body{
+			margin-left: 50px;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		.stats, .bugname{
+			font-size: 22pt;
+		}
+        .some{
+
+        }
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-weight: bold;
+			font-style: italic;
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+		}
+		li{
+			margin-bottom: 10px;
+			border : 1px solid gray;
+			background-color: #e7e7e7;
+			padding: 5px;
+			border-radius: 5px;
+		}
+		.datetime{
+			font-size: small;
+			font-style: italic;
+
+		}
+		.bugname{
+			cursor : pointer;
+		}
+	</style>
+	<script src="babel.min.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+
+
+	<script type="text/babel">
+
+		
+		class NameForm extends React.Component{
+			
+            handleChange(){
+                console.log("handle submit !!")
+               
+            }
+            handleSubmit(event) {
+                alert('A name was submitted: ');
+                event.preventDefault();
+              }
+			render(){
+                var inputTxt=0;
+				return (
+                        <form onSubmit={this.handleSubmit}>
+                        <label>
+                        Name:
+                        <input type="text" value={this.inputTxt}  onChange={this.handleChange} />
+                        </label>
+                        <input type="submit" value="Submit" />
+                        </form>
+				)
+			}
+		}
+
+ 
+
+//		var bugsCollectionModel = new BugsCollectionModel();
+//		bugsCollectionModel.onChange(renderApp);
+
+		function renderApp(){
+			ReactDOM.render(<NameForm></NameForm>, document.getElementById("content"));
+		}
+		renderApp();
+	</script>
+</head>
+<body>
+	<h1>Controlled Component</h1>
+	<hr>
+	<div id="content">
+	</div>
+</body>
+</html>

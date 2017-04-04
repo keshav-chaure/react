@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello World!</title>
+	<script src="jquery-3.2.0.js"></script>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel.min.js"></script>
+	<script type="text/babel">
+		var HelloWorldReact = React.createClass({
+			render : function(){
+				return (
+					<h1>{this.props.message}</h1>
+				)
+			}
+		});
+		var counter = 0;
+		function renderReact(){
+			++counter;
+			var msg = 'Welcome to the world of React!';
+
+			ReactDOM.render(<HelloWorldReact message={msg}></HelloWorldReact>, document.getElementById("react-content"));
+		}
+
+		function HelloWorldView(){
+			var $viewEle = this.$viewEle = $('<div></div>');
+			var _template = '<h1>Welcome to the world of jQuery!</h1>';
+			this.render = function(){
+				$viewEle.html(_template);
+			}
+		}
+		
+		var helloWorldView = new HelloWorldView();
+
+		function renderNonReact(){
+			
+			helloWorldView.render();
+		}
+		$(function(){
+			helloWorldView.$viewEle.appendTo("#non-react-content");
+			$("#btnRenderReact").click(renderReact);
+			$("#btnRenderNonReact").click(renderNonReact);
+		})
+	</script>
+
+</head>
+<body>
+	<input type="button" value="Render React" id="btnRenderReact">
+	<div id="react-content">
+		
+	</div>
+	<hr>
+	<input type="button" value="Render Non React" id="btnRenderNonReact">
+	<div id="non-react-content">
+		
+	</div>
+</body>
+</html>
